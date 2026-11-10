@@ -1,0 +1,509 @@
+﻿
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CropAI | Smart Crop Protection</title>
+
+    <meta name="description"
+          content="CropAI uses artificial intelligence to analyze crop leaf images and identify possible plant diseases.">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* Admin navigation */
+        .admin-nav-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 11px 16px;
+            border-radius: 10px;
+            background: #e8f7ee;
+            color: #087c45 !important;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .admin-nav-link:hover {
+            background: #d5f0df;
+            transform: translateY(-1px);
+        }
+
+        .nav-user {
+            color: #16864f;
+            font-weight: 600;
+        }
+
+        @media (max-width: 700px) {
+            .topbar {
+                flex-wrap: wrap;
+                gap: 12px;
+            }
+
+            .nav-links {
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+
+            .admin-nav-link {
+                padding: 8px 11px;
+            }
+        }
+    </style>
+</head>
+
+<body class="site-body">
+
+<!-- =========================================
+     NAVIGATION BAR
+========================================= -->
+
+<nav class="topbar">
+
+    <a class="brand" href="{{ url_for('home') }}">
+        <span class="brand-mark">✦</span>
+        Crop<span>AI</span>
+    </a>
+
+    <div class="nav-links">
+
+        <a class="active" href="{{ url_for('index') }}">
+            Home
+        </a>
+
+        <a href="#about">
+            About
+        </a>
+
+        {% if session.get('user_id') %}
+
+            <span class="nav-user">
+                Hi, {{ session.get('user_name', 'User') }}
+            </span>
+
+            <!-- ADMIN DASHBOARD BUTTON -->
+            <a class="admin-nav-link"
+               href="{{ url_for('admin_dashboard') }}">
+                <span>▦</span>
+                Admin Dashboard
+            </a>
+
+            <a class="nav-cta" href="{{ url_for('logout') }}">
+                Logout
+            </a>
+
+        {% else %}
+
+            <a href="{{ url_for('login') }}">
+                Login
+            </a>
+
+            <a href="{{ url_for('register') }}">
+                Register
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</nav>
+
+
+<!-- =========================================
+     MAIN CONTENT
+========================================= -->
+
+<main>
+
+    <section class="hero">
+
+        <!-- LEFT CONTENT -->
+
+        <div class="hero-copy">
+
+            <div class="eyebrow">
+                <span class="pulse"></span>
+                SMART FARMING · HEALTHY CROPS
+            </div>
+
+            <h1>
+                Protect every leaf.<br>
+                <span>Grow a better future.</span>
+            </h1>
+
+            <p class="hero-lead">
+                AI-powered crop disease detection that helps
+                identify possible plant diseases through
+                leaf images.
+            </p>
+
+            <!-- PROCESS STEPS -->
+
+            <div class="hero-points">
+
+                <div>
+                    <b>01</b>
+                    <span>Upload image</span>
+                </div>
+
+                <div>
+                    <b>02</b>
+                    <span>AI analysis</span>
+                </div>
+
+                <div>
+                    <b>03</b>
+                    <span>View results</span>
+                </div>
+
+            </div>
+
+            <div class="hero-note">
+                🌱 Smarter farming starts with healthier leaves.
+            </div>
+
+        </div>
+
+
+        <!-- RIGHT UPLOAD PANEL -->
+
+        <div class="upload-panel">
+
+            <div class="upload-panel-top">
+
+                <span class="mini-icon">⌁</span>
+
+                <div>
+                    <b>Leaf Health Scanner</b>
+
+                    <small>
+                        Upload a clear plant leaf photograph
+                    </small>
+                </div>
+
+                <span class="live-tag">
+                    ● READY
+                </span>
+
+            </div>
+
+
+            <!-- LEAF ANIMATION -->
+
+            <div class="leaf-art">
+
+                <div class="orbit orbit-one"></div>
+                <div class="orbit orbit-two"></div>
+
+                <div class="leaf-emoji">
+                    🌿
+                </div>
+
+                <span class="scan-dot dot-a"></span>
+                <span class="scan-dot dot-b"></span>
+                <span class="scan-dot dot-c"></span>
+
+                <div class="scan-caption">
+                    AI VISION SCAN
+                </div>
+
+            </div>
+
+
+            <!-- FLASH MESSAGES -->
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+
+            <!-- IMAGE UPLOAD FORM -->
+
+            <form
+                action="{{ url_for('index') }}"
+                method="POST"
+                enctype="multipart/form-data"
+                class="upload-form"
+                id="upload-form"
+            >
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+                <!-- FILE SELECTION -->
+
+                <label class="drop-zone" for="leaf-file">
+
+                    <span class="upload-symbol">
+                        ↑
+                    </span>
+
+                    <strong>
+                        Choose a leaf image
+                    </strong>
+
+                    <small>
+                        JPG, JPEG or PNG
+                    </small>
+
+                    <span id="file-name">
+                        No file selected
+                    </span>
+
+                </label>
+
+
+                <input
+                    type="file"
+                    id="leaf-file"
+                    name="file"
+                    accept=".jpg,.jpeg,.png"
+                    required
+                    hidden
+                >
+
+
+                <!-- SUBMIT BUTTON -->
+
+                <button
+                    class="button button-primary button-wide"
+                    type="submit"
+                    id="analyze-button"
+                >
+                    ✦ Detect Disease →
+                </button>
+
+            </form>
+
+
+            <p class="privacy-note">
+                AI-generated educational predictions.
+                Always verify results with an agricultural expert.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         TRUST SECTION
+    ====================================== -->
+
+    <section class="trust-strip">
+
+        <div>
+            <span>✳</span>
+
+            <b>AI-assisted screening</b>
+
+            <small>
+                Machine learning predictions
+            </small>
+        </div>
+
+        <div>
+            <span>⌁</span>
+
+            <b>Fast analysis</b>
+
+            <small>
+                Upload and review results
+            </small>
+        </div>
+
+        <div>
+            <span>♧</span>
+
+            <b>Crop-focused insights</b>
+
+            <small>
+                Leaf image classification
+            </small>
+        </div>
+
+    </section>
+
+
+    <!-- =====================================
+         ABOUT SECTION
+    ====================================== -->
+
+    <section class="about-section" id="about">
+
+        <div class="section-kicker">
+            WHY CROPAI
+        </div>
+
+        <h2>
+            Technology that helps<br>
+            cultivate confidence.
+        </h2>
+
+        <p>
+            Our system uses deep learning to analyze
+            plant leaf images and identify possible
+            crop disease categories.
+        </p>
+
+        <div class="about-grid">
+
+            <article>
+
+                <span class="about-icon">
+                    ⌕
+                </span>
+
+                <h3>
+                    Image Analysis
+                </h3>
+
+                <p>
+                    Upload a clear leaf photograph
+                    for AI analysis.
+                </p>
+
+            </article>
+
+
+            <article>
+
+                <span class="about-icon">
+                    ◉
+                </span>
+
+                <h3>
+                    Understand Results
+                </h3>
+
+                <p>
+                    View predicted disease categories
+                    and confidence.
+                </p>
+
+            </article>
+
+
+            <article>
+
+                <span class="about-icon">
+                    ▤
+                </span>
+
+                <h3>
+                    Prediction History
+                </h3>
+
+                <p>
+                    Administrators can review
+                    recorded predictions.
+                </p>
+
+            </article>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- =========================================
+     FOOTER
+========================================= -->
+
+<footer class="footer">
+
+    <a class="brand" href="{{ url_for('home') }}">
+        ✦ CropAI
+    </a>
+
+    <span>
+        Growing smarter, one leaf at a time.
+    </span>
+
+</footer>
+
+
+<!-- =========================================
+     JAVASCRIPT
+========================================= -->
+
+<script>
+
+    const fileInput = document.getElementById("leaf-file");
+
+    const fileName = document.getElementById("file-name");
+
+    const uploadForm = document.getElementById("upload-form");
+
+    const analyzeButton = document.getElementById("analyze-button");
+
+
+    // DISPLAY SELECTED IMAGE NAME
+
+    fileInput.addEventListener("change", function () {
+
+        if (this.files.length > 0) {
+            fileName.textContent = this.files[0].name;
+        } else {
+            fileName.textContent = "No file selected";
+        }
+
+    });
+
+
+    // BASIC FILE VALIDATION
+
+    uploadForm.addEventListener("submit", function (event) {
+
+        if (!fileInput.files.length) {
+            event.preventDefault();
+            alert("Please select a crop leaf image.");
+            return;
+        }
+
+        const file = fileInput.files[0];
+
+        const allowedTypes = [
+            "image/jpeg",
+            "image/png"
+        ];
+
+        if (!allowedTypes.includes(file.type)) {
+            event.preventDefault();
+            alert("Please upload a JPG, JPEG or PNG image.");
+            return;
+        }
+
+        if (file.size > 10 * 1024 * 1024) {
+            event.preventDefault();
+            alert("Image size must be less than 10 MB.");
+            return;
+        }
+
+        analyzeButton.disabled = true;
+        analyzeButton.textContent = "Analyzing image...";
+
+    });
+
+</script>
+
+</body>
+</html>

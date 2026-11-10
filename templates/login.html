@@ -1,0 +1,166 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Login | CropAI</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+
+<body class="auth-body">
+
+<a class="auth-back" href="{{ url_for('home') }}">
+    ← Back to CropAI
+</a>
+
+<div class="auth-layout">
+
+    <!-- LEFT VISUAL SECTION -->
+
+    <section class="auth-visual">
+
+        <div class="auth-visual-content">
+
+            <a class="brand brand-light"
+               href="{{ url_for('home') }}">
+                ✦ CropAI
+            </a>
+
+            <div class="visual-orb">🌱</div>
+
+            <div class="visual-label">
+                SMART AGRICULTURE, HEALTHIER HARVESTS
+            </div>
+
+            <h1>
+                Every healthy harvest
+                starts with <em>insight.</em>
+            </h1>
+
+            <p>
+                Use AI-powered leaf screening to explore
+                possible crop disease conditions.
+            </p>
+
+            <div class="visual-bottom">
+                ✦ Grow smart. Grow confident.
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- LOGIN SECTION -->
+
+    <section class="auth-main">
+
+        <div class="auth-card">
+
+            <div class="auth-logo">✦</div>
+
+            <div class="section-kicker">
+                WELCOME BACK
+            </div>
+
+            <h2>Sign in to CropAI</h2>
+
+            <p class="auth-subtitle">
+                Continue to your crop health workspace.
+            </p>
+
+
+            <!-- FLASH MESSAGES -->
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+
+                {% for category, message in messages %}
+
+                    <div class="flash {{ category }}">
+                        {{ message }}
+                    </div>
+
+                {% endfor %}
+
+            {% endwith %}
+
+
+            <!-- LOGIN FORM -->
+
+            <form method="POST"
+                  action="{{ url_for('login') }}"
+                  class="auth-form">
+
+                <!-- CSRF SECURITY TOKEN -->
+
+                <input
+                    type="hidden"
+                    name="csrf_token"
+                    value="{{ csrf_token() }}"
+                >
+
+
+                <label for="email">
+                    Email address
+                </label>
+
+                <input
+                    type="email"
+                    id="email"
+                    name="email"
+                    placeholder="you@example.com"
+                    autocomplete="username"
+                    maxlength="254"
+                    required
+                >
+
+
+                <label for="password">
+                    Password
+                </label>
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Enter your password"
+                    autocomplete="current-password"
+                    required
+                >
+
+
+                <button
+                    class="button button-primary button-wide"
+                    type="submit"
+                >
+                    Sign in →
+                </button>
+
+            </form>
+
+
+            <!-- REGISTER LINK -->
+
+            <div class="auth-switch">
+
+                New to CropAI?
+
+                <a href="{{ url_for('register') }}">
+                    Create an account
+                </a>
+
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+</body>
+</html>

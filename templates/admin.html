@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Admin Dashboard | CropAI</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+    <style>
+        /* GENERAL */
+
+        .admin-main {
+            min-width: 0;
+        }
+
+        .admin-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .admin-top h1 {
+            margin-bottom: 8px;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .admin-profile .avatar {
+            width: 42px;
+            height: 42px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            background: #176b43;
+            color: white;
+            font-weight: 800;
+        }
+
+        /* ADMIN BUTTON */
+
+        .admin-dashboard-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #176b43;
+            color: white !important;
+            padding: 12px 19px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: .2s;
+        }
+
+        .admin-dashboard-button:hover {
+            background: #105333;
+            transform: translateY(-2px);
+        }
+
+        /* FILTER */
+
+        .history-filter {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+            margin: 22px 0 12px;
+        }
+
+        .history-filter input,
+        .history-filter select {
+            padding: 12px 14px;
+            border: 1px solid #dce8df;
+            border-radius: 9px;
+            background: white;
+            color: #173c2b;
+            font-family: inherit;
+            min-width: 150px;
+        }
+
+        .history-filter input[name="search"] {
+            flex: 1;
+        }
+
+        .history-filter button {
+            border: none;
+            background: #176b43;
+            color: white;
+            border-radius: 9px;
+            padding: 12px 18px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: inherit;
+        }
+
+        .history-filter button:hover {
+            background: #105333;
+        }
+
+        .history-filter a {
+            color: #176b43;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .filter-count {
+            color: #718278;
+            font-size: 13px;
+            margin-bottom: 15px;
+        }
+
+        /* ACTION BUTTONS */
+
+        .action-buttons {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            flex-wrap: wrap;
+        }
+
+        .view-details-button,
+        .delete-button {
+            border: none;
+            border-radius: 9px;
+            padding: 11px 15px;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            display: inline-block;
+        }
+
+        .view-details-button {
+            background: #e5f3e9;
+            color: #176b43;
+        }
+
+        .delete-button {
+            background: #fde8e8;
+            color: #c62828;
+        }
+
+        .view-details-button:hover {
+            background: #d2ead9;
+        }
+
+        .delete-button:hover {
+            background: #fbd4d4;
+        }
+
+        /* PAGINATION */
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            margin: 25px 0;
+        }
+
+        .pagination a {
+            padding: 10px 16px;
+            border-radius: 8px;
+            background: #e5f3e9;
+            color: #176b43;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .pagination a.disabled {
+            opacity: .4;
+            pointer-events: none;
+        }
+
+        .pagination span {
+            font-weight: 600;
+            color: #315c44;
+        }
+
+        /* EMPTY STATE */
+
+        .empty-state {
+            text-align: center;
+            padding: 30px !important;
+            color: #718278;
+        }
+
+        /* FLASH MESSAGES */
+
+        .flash {
+            padding: 12px 16px;
+            border-radius: 9px;
+            margin: 15px 0;
+        }
+
+        .flash.success {
+            background: #e5f5e9;
+            color: #176b43;
+        }
+
+        .flash.error,
+        .flash.danger {
+            background: #fde8e8;
+            color: #b42318;
+        }
+
+        /* TABLE */
+
+        .table-shell {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        .history-thumb {
+            width: 55px;
+            height: 55px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .confidence-pill {
+            display: inline-block;
+            padding: 6px 10px;
+            border-radius: 20px;
+            background: #e5f3e9;
+            color: #176b43;
+            font-weight: 700;
+            font-size: 12px;
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 700px) {
+
+            .history-filter {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .history-filter input,
+            .history-filter select,
+            .history-filter button {
+                width: 100%;
+            }
+
+            .action-buttons {
+                min-width: 150px;
+            }
+
+            .table-shell {
+                overflow-x: auto;
+            }
+
+            .admin-top {
+                align-items: flex-start;
+            }
+
+            .pagination {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body class="admin-body">
+
+    <!-- SIDEBAR -->
+
+    <aside class="sidebar">
+
+        <a class="brand brand-light" href="{{ url_for('home') }}">
+            <span class="brand-mark">✦</span>
+            Crop<span>AI</span>
+        </a>
+
+        <div class="side-caption">WORKSPACE</div>
+
+        <a class="side-link active"
+           href="{{ url_for('admin_dashboard') }}">
+            ▦ <span>Overview</span>
+        </a>
+
+        <a class="side-link" href="#history">
+            ▤ <span>Prediction history</span>
+        </a>
+
+        <a class="side-link"
+           href="{{ url_for('export_predictions') }}">
+            ⇩ <span>Export data</span>
+        </a>
+
+        <div class="sidebar-bottom">
+
+            <div class="side-caption">ACCOUNT</div>
+
+            <a class="side-link" href="{{ url_for('home') }}">
+                ⌂ <span>Home Page</span>
+            </a>
+
+            <a class="side-link"
+               href="{{ url_for('logout') }}">
+                ↪ <span>Logout</span>
+            </a>
+
+            <div class="sidebar-note">
+                <span>✦</span>
+                <b>CropAI</b>
+                <small>Growing smarter, one leaf at a time.</small>
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- MAIN CONTENT -->
+
+    <main class="admin-main">
+
+        <!-- HEADER -->
+
+        <header class="admin-top">
+
+            <div>
+
+                <div class="section-kicker">
+                    CROP HEALTH INTELLIGENCE
+                </div>
+
+                <h1>Dashboard overview</h1>
+
+                <p>
+                    Monitor predictions and explore your model activity.
+                </p>
+
+            </div>
+
+            <div style="display:flex;align-items:center;gap:15px;flex-wrap:wrap;">
+
+                <!-- VISIBLE ADMIN DASHBOARD BUTTON -->
+
+                <a class="admin-dashboard-button"
+                   href="{{ url_for('admin_dashboard') }}">
+                    ▦ Admin Dashboard
+                </a>
+
+                <div class="admin-profile">
+
+                    <span class="avatar">
+                        {{ (user_name|default('Admin'))[:1]|upper }}
+                    </span>
+
+                    <div>
+                        <b>{{ user_name|default('Administrator') }}</b>
+                        <small>Administrator</small>
+                    </div>
+
+                    <span>⌄</span>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- FLASH MESSAGES -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% for category, message in messages %}
+
+                <div class="flash {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endwith %}
+
+
+        <!-- DASHBOARD METRICS -->
+
+        <section class="metric-grid">
+
+            <div class="metric-card">
+
+                <div class="metric-top">
+                    <span>Total predictions</span>
+                    <i>▤</i>
+                </div>
+
+                <strong>{{ stats.total|default(0) }}</strong>
+
+                <small>All recorded scans</small>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-top">
+                    <span>Disease categories</span>
+                    <i>⌘</i>
+                </div>
+
+                <strong>{{ stats.categories|default(0) }}</strong>
+
+                <small>Classes detected in history</small>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-top">
+                    <span>Healthy predictions</span>
+                    <i>♧</i>
+                </div>
+
+                <strong>{{ stats.healthy|default(0) }}</strong>
+
+                <small>Classes marked healthy</small>
+
+            </div>
+
+
+            <div class="metric-card">
+
+                <div class="metric-top">
+                    <span>Average confidence</span>
+                    <i>✧</i>
+                </div>
+
+                <strong>
+                    {{ stats.average_confidence|default(0) }}<em>%</em>
+                </strong>
+
+                <small>Across recorded predictions</small>
+
+            </div>
+
+        </section>
+
+
+        <!-- ANALYTICS HEADING -->
+
+        <section class="analytics-head">
+
+            <div>
+
+                <div class="section-kicker">
+                    SYSTEM INSIGHTS
+                </div>
+
+                <h2>Analytics & reports</h2>
+
+            </div>
+
+            <a class="button button-outline button-small"
+               href="{{ url_for('export_predictions') }}">
+                ⇩ Export CSV
+            </a>
+
+        </section>
+
+
+        <!-- CHARTS -->
+
+        <section class="chart-grid">
+
+            <article class="chart-card">
+
+                <div class="chart-title">
+
+                    <div>
+                        <h3>Disease distribution</h3>
+                        <p>Predictions by detected class</p>
+                    </div>
+
+                    <span class="chart-badge">BY CLASS</span>
+
+                </div>
+
+                <div class="chart-wrap">
+                    <canvas id="diseaseChart"></canvas>
+                </div>
+
+            </article>
+
+
+            <article class="chart-card">
+
+                <div class="chart-title">
+
+                    <div>
+                        <h3>Healthy vs diseased</h3>
+                        <p>Overall prediction split</p>
+                    </div>
+
+                    <span class="chart-badge">OVERVIEW</span>
+
+                </div>
+
+                <div class="chart-wrap">
+                    <canvas id="healthChart"></canvas>
+                </div>
+
+            </article>
+
+
+            <article class="chart-card chart-wide">
+
+                <div class="chart-title">
+
+                    <div>
+                        <h3>Prediction activity</h3>
+                        <p>Daily number of image analyses</p>
+                    </div>
+
+                    <span class="chart-badge">DAILY TREND</span>
+
+                </div>
+
+                <div class="chart-wrap trend-wrap">
+                    <canvas id="trendChart"></canvas>
+                </div>
+
+            </article>
+
+
+            <article class="chart-card">
+
+                <div class="chart-title">
+
+                    <div>
+                        <h3>Most detected classes</h3>
+                        <p>Count by disease category</p>
+                    </div>
+
+                    <span class="chart-badge">RANKING</span>
+
+                </div>
+
+                <div class="chart-wrap">
+                    <canvas id="barChart"></canvas>
+                </div>
+
+            </article>
+
+        </section>
+
+
+        <!-- PREDICTION HISTORY -->
+
+        <section class="history-section" id="history">
+
+            <div class="history-heading">
+
+                <div>
+
+                    <div class="section-kicker">
+                        RECENT ACTIVITY
+                    </div>
+
+                    <h2>Prediction history</h2>
+
+                </div>
+
+                <span class="record-count">
+                    {{ total_filtered|default(0) }} records
+                </span>
+
+            </div>
+
+
+            <!-- SEARCH AND FILTER -->
+
+            <form method="GET"
+                  action="{{ url_for('admin_dashboard') }}"
+                  class="history-filter">
+
+                <input
+                    type="text"
+                    name="search"
+                    placeholder="Search disease name..."
+                    value="{{ search|default('') }}"
+                >
+
+                <select name="status">
+
+                    <option value="all"
+                        {% if status|default('all') == 'all' %}selected{% endif %}>
+                        All predictions
+                    </option>
+
+                    <option value="healthy"
+                        {% if status|default('all') == 'healthy' %}selected{% endif %}>
+                        Healthy
+                    </option>
+
+                    <option value="diseased"
+                        {% if status|default('all') == 'diseased' %}selected{% endif %}>
+                        Diseased
+                    </option>
+
+                </select>
+
+                <input
+                    type="date"
+                    name="date"
+                    value="{{ selected_date|default('') }}"
+                >
+
+                <button type="submit">
+                    Apply Filters
+                </button>
+
+                <a href="{{ url_for('admin_dashboard') }}">
+                    Clear Filters
+                </a>
+
+            </form>
+
+
+            <p class="filter-count">
+
+                Showing {{ records|length }} of
+                {{ total_filtered|default(0) }} matching records
+
+            </p>
+
+
+            <!-- PREDICTION TABLE -->
+
+            <div class="table-shell">
+
+                <table>
+
+                    <thead>
+
+                        <tr>
+                            <th>ID</th>
+                            <th>LEAF IMAGE</th>
+                            <th>PREDICTED CLASS</th>
+                            <th>CONFIDENCE</th>
+                            <th>DATE & TIME</th>
+                            <th>ACTIONS</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        {% for record in records %}
+
+                            <tr>
+
+                                <td class="muted-cell">
+                                    #{{ record["id"] }}
+                                </td>
+
+                                <td>
+
+                                    {% if record.get("filename") %}
+
+                                        <img
+                                            class="history-thumb"
+                                            src="{{ url_for('static', filename='uploads/' + record['filename']) }}"
+                                            alt="Crop leaf"
+                                            loading="lazy"
+                                        >
+
+                                    {% else %}
+
+                                        No image
+
+                                    {% endif %}
+
+                                </td>
+
+                                <td>
+                                    <b>
+                                        {{ record["disease"]|replace("_", " ") }}
+                                    </b>
+                                </td>
+
+                                <td>
+
+                                    <span class="confidence-pill">
+                                        {{ "%.2f"|format(record["confidence"]|float) }}%
+                                    </span>
+
+                                </td>
+
+                                <td class="muted-cell">
+                                    {{ record["created_at"] }}
+                                </td>
+
+                                <td>
+
+                                    <div class="action-buttons">
+
+                                        <a
+                                            class="view-details-button"
+                                            href="{{ url_for('prediction_details', prediction_id=record['id']) }}"
+                                        >
+                                            View Details
+                                        </a>
+
+
+                                        <!-- DELETE FORM -->
+
+                                        <form
+                                            method="POST"
+                                            action="{{ url_for('delete_prediction_route', prediction_id=record['id']) }}"
+                                            onsubmit="return confirm('Are you sure you want to permanently delete this prediction?');"
+                                        >
+
+                                            <input
+                                                type="hidden"
+                                                name="csrf_token"
+                                                value="{{ csrf_token() }}"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="search"
+                                                value="{{ search|default('') }}"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="status"
+                                                value="{{ status|default('all') }}"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="date"
+                                                value="{{ selected_date|default('') }}"
+                                            >
+
+                                            <input
+                                                type="hidden"
+                                                name="page"
+                                                value="{{ page|default(1) }}"
+                                            >
+
+                                            <button
+                                                type="submit"
+                                                class="delete-button"
+                                            >
+                                                Delete
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        {% else %}
+
+                            <tr>
+                                <td colspan="6" class="empty-state">
+                                    No matching predictions found.
+                                </td>
+                            </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <!-- PAGINATION -->
+
+            <div class="pagination">
+
+                {% if page|default(1) > 1 %}
+
+                    <a href="{{ url_for(
+                        'admin_dashboard',
+                        page=page-1,
+                        search=search,
+                        status=status,
+                        date=selected_date
+                    ) }}#history">
+                        ← Previous
+                    </a>
+
+                {% else %}
+
+                    <a class="disabled">
+                        ← Previous
+                    </a>
+
+                {% endif %}
+
+
+                <span>
+                    Page {{ page|default(1) }} of {{ total_pages|default(1) }}
+                </span>
+
+
+                {% if page|default(1) < total_pages|default(1) %}
+
+                    <a href="{{ url_for(
+                        'admin_dashboard',
+                        page=page+1,
+                        search=search,
+                        status=status,
+                        date=selected_date
+                    ) }}#history">
+                        Next →
+                    </a>
+
+                {% else %}
+
+                    <a class="disabled">
+                        Next →
+                    </a>
+
+                {% endif %}
+
+            </div>
+
+        </section>
+
+
+        <!-- FOOTER -->
+
+        <footer class="admin-footer">
+
+            CropAI · AI Crop Disease Detection
+
+            <span>
+                Powered by Machine Learning & TensorFlow
+            </span>
+
+        </footer>
+
+    </main>
+
+
+    <!-- CHARTS JAVASCRIPT -->
+
+    <script>
+
+        // DATA FROM FLASK
+
+        const labels = {{ stats.disease_counts
+            |default([], true)
+            |map(attribute='disease')
+            |map('replace', '_', ' ')
+            |list
+            |tojson
+        }};
+
+        const values = {{ stats.disease_counts
+            |default([], true)
+            |map(attribute='total')
+            |list
+            |tojson
+        }};
+
+        const days = {{ stats.daily_counts
+            |default([], true)
+            |map(attribute='day')
+            |list
+            |tojson
+        }};
+
+        const daily = {{ stats.daily_counts
+            |default([], true)
+            |map(attribute='total')
+            |list
+            |tojson
+        }};
+
+        const healthyCount = {{ stats.healthy|default(0) }};
+        const diseasedCount = {{ stats.diseased|default(0) }};
+
+
+        // DEFAULT CHART SETTINGS
+
+        Chart.defaults.font.family = "'DM Sans', sans-serif";
+        Chart.defaults.color = "#6b7d72";
+
+
+        // GRADIENT
+
+        const greenGradient = (ctx) => {
+
+            const gradient = ctx.createLinearGradient(
+                0, 0, 0, 260
+            );
+
+            gradient.addColorStop(
+                0, "rgba(32,169,91,.25)"
+            );
+
+            gradient.addColorStop(
+                1, "rgba(32,169,91,.01)"
+            );
+
+            return gradient;
+        };
+
+
+        // DISEASE DISTRIBUTION
+
+        new Chart(
+            document.getElementById("diseaseChart"),
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: labels,
+
+                    datasets: [{
+                        data: values,
+
+                        backgroundColor: [
+                            "#159653",
+                            "#7acb79",
+                            "#b5df85",
+                            "#f2c66d",
+                            "#5ab8a2",
+                            "#83a9d9",
+                            "#a58bd4"
+                        ],
+
+                        borderWidth: 4,
+                        borderColor: "#fff",
+                        hoverOffset: 7
+                    }]
+                },
+
+                options: {
+                    maintainAspectRatio: false,
+                    cutout: "68%",
+
+                    plugins: {
+                        legend: {
+                            position: "bottom",
+
+                            labels: {
+                                usePointStyle: true,
+                                boxWidth: 7,
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+
+        // HEALTHY VS DISEASED
+
+        new Chart(
+            document.getElementById("healthChart"),
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: ["Healthy", "Diseased"],
+
+                    datasets: [{
+                        data: [
+                            healthyCount,
+                            diseasedCount
+                        ],
+
+                        backgroundColor: [
+                            "#25a65a",
+                            "#f2a65a"
+                        ],
+
+                        borderWidth: 4,
+                        borderColor: "#fff"
+                    }]
+                },
+
+                options: {
+                    maintainAspectRatio: false,
+                    cutout: "65%",
+
+                    plugins: {
+                        legend: {
+                            position: "bottom"
+                        }
+                    }
+                }
+            }
+        );
+
+
+        // DAILY PREDICTION TREND
+
+        new Chart(
+            document.getElementById("trendChart"),
+            {
+                type: "line",
+
+                data: {
+                    labels: days,
+
+                    datasets: [{
+                        label: "Predictions",
+                        data: daily,
+
+                        borderColor: "#159653",
+
+                        backgroundColor: (context) =>
+                            greenGradient(context.chart.ctx),
+
+                        fill: true,
+                        tension: .38,
+                        pointRadius: 4,
+                        pointBackgroundColor: "#159653",
+                        pointBorderColor: "#fff",
+                        pointBorderWidth: 2
+                    }]
+                },
+
+                options: {
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        },
+
+                        y: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+
+        // MOST DETECTED CLASSES
+
+        new Chart(
+            document.getElementById("barChart"),
+            {
+                type: "bar",
+
+                data: {
+                    labels: labels,
+
+                    datasets: [{
+                        label: "Predictions",
+                        data: values,
+                        backgroundColor: "#36aa68",
+                        borderRadius: 7,
+                        barThickness: 15
+                    }]
+                },
+
+                options: {
+                    indexAxis: "y",
+                    maintainAspectRatio: false,
+
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+
+                            ticks: {
+                                precision: 0
+                            }
+                        },
+
+                        y: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            }
+        );
+
+    </script>
+
+</body>
+</html>

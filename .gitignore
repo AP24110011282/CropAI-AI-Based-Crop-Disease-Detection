@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Environment variables
+.env
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploaded images
+static/uploads/*
+
+# Cache
+.pytest_cache/
+.mypy_cache/
+
+# IDE
+.vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+dataset/

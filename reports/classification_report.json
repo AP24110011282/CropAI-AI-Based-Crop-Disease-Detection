@@ -1,0 +1,105 @@
+{
+    "Pepper__bell___Bacterial_spot": {
+        "precision": 0.9539473684210527,
+        "recall": 0.9731543624161074,
+        "f1-score": 0.9634551495016611,
+        "support": 149.0
+    },
+    "Pepper__bell___healthy": {
+        "precision": 1.0,
+        "recall": 0.9819004524886877,
+        "f1-score": 0.9908675799086758,
+        "support": 221.0
+    },
+    "Potato___Early_blight": {
+        "precision": 0.9867549668874173,
+        "recall": 0.9933333333333333,
+        "f1-score": 0.9900332225913622,
+        "support": 150.0
+    },
+    "Potato___Late_blight": {
+        "precision": 0.8827160493827161,
+        "recall": 0.9533333333333334,
+        "f1-score": 0.9166666666666666,
+        "support": 150.0
+    },
+    "Potato___healthy": {
+        "precision": 0.9130434782608695,
+        "recall": 0.9130434782608695,
+        "f1-score": 0.9130434782608695,
+        "support": 23.0
+    },
+    "Tomato_Bacterial_spot": {
+        "precision": 0.9202453987730062,
+        "recall": 0.9404388714733543,
+        "f1-score": 0.9302325581395349,
+        "support": 319.0
+    },
+    "Tomato_Early_blight": {
+        "precision": 0.7191780821917808,
+        "recall": 0.7,
+        "f1-score": 0.7094594594594594,
+        "support": 150.0
+    },
+    "Tomato_Late_blight": {
+        "precision": 0.9610894941634242,
+        "recall": 0.8606271777003485,
+        "f1-score": 0.9080882352941176,
+        "support": 287.0
+    },
+    "Tomato_Leaf_Mold": {
+        "precision": 0.806060606060606,
+        "recall": 0.9300699300699301,
+        "f1-score": 0.8636363636363636,
+        "support": 143.0
+    },
+    "Tomato_Septoria_leaf_spot": {
+        "precision": 0.8943089430894309,
+        "recall": 0.8270676691729323,
+        "f1-score": 0.859375,
+        "support": 266.0
+    },
+    "Tomato_Spider_mites_Two_spotted_spider_mite": {
+        "precision": 0.9227642276422764,
+        "recall": 0.9007936507936508,
+        "f1-score": 0.9116465863453815,
+        "support": 252.0
+    },
+    "Tomato__Target_Spot": {
+        "precision": 0.8060344827586207,
+        "recall": 0.8904761904761904,
+        "f1-score": 0.8461538461538461,
+        "support": 210.0
+    },
+    "Tomato__Tomato_YellowLeaf__Curl_Virus": {
+        "precision": 0.9914893617021276,
+        "recall": 0.966804979253112,
+        "f1-score": 0.9789915966386554,
+        "support": 482.0
+    },
+    "Tomato__Tomato_mosaic_virus": {
+        "precision": 0.9322033898305084,
+        "recall": 0.9821428571428571,
+        "f1-score": 0.9565217391304348,
+        "support": 56.0
+    },
+    "Tomato_healthy": {
+        "precision": 0.9426229508196722,
+        "recall": 0.9663865546218487,
+        "f1-score": 0.9543568464730291,
+        "support": 238.0
+    },
+    "accuracy": 0.9189276485788114,
+    "macro avg": {
+        "precision": 0.9088305866655673,
+        "recall": 0.9186381893691037,
+        "f1-score": 0.912835221880004,
+        "support": 3096.0
+    },
+    "weighted avg": {
+        "precision": 0.9209394982032141,
+        "recall": 0.9189276485788114,
+        "f1-score": 0.9190642952849395,
+        "support": 3096.0
+    }
+}

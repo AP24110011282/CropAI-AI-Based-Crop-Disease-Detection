@@ -1,0 +1,974 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>CropAI | Crop Health Assessment</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --green: #128653;
+            --dark-green: #075d3b;
+            --light-green: #eaf7ef;
+            --border: #dcebe1;
+            --text: #142c22;
+            --muted: #718078;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #f8fbf9;
+            color: var(--text);
+        }
+
+        /* Navigation */
+
+        .navbar {
+            min-height: 66px;
+            background: white;
+            border-bottom: 1px solid #e5eee8;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 8%;
+        }
+
+        .brand {
+            font-size: 23px;
+            font-weight: 800;
+            color: #172b20;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .brand span {
+            color: var(--green);
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: #34483d;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .nav-links a:hover {
+            color: var(--green);
+        }
+
+        .logout-btn {
+            background: var(--green);
+            color: white !important;
+            padding: 11px 22px;
+            border-radius: 9px;
+        }
+
+        .logout-btn:hover {
+            background: var(--dark-green);
+        }
+
+        /* Page heading */
+
+        .page-container {
+            max-width: 1120px;
+            width: 92%;
+            margin: 36px auto 60px;
+        }
+
+        .eyebrow {
+            font-size: 10px;
+            font-weight: 800;
+            color: var(--green);
+            letter-spacing: 2px;
+            margin-bottom: 12px;
+        }
+
+        .page-heading {
+            font-size: clamp(25px, 4vw, 34px);
+            color: var(--dark-green);
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .page-description {
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.7;
+            margin-bottom: 25px;
+        }
+
+        /* Main report */
+
+        .report-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(22, 80, 48, 0.06);
+        }
+
+        .report-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 26px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .report-title {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .complete-badge {
+            background: var(--light-green);
+            color: var(--green);
+            padding: 8px 13px;
+            border-radius: 30px;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .report-body {
+            padding: 23px;
+        }
+
+        /* Main layout */
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 0.92fr 1.08fr;
+            gap: 27px;
+        }
+
+        /* Uploaded image */
+
+        .image-wrapper {
+            position: relative;
+            overflow: hidden;
+            border-radius: 13px;
+            background: #edf4ef;
+        }
+
+        .crop-image {
+            width: 100%;
+            height: 325px;
+            object-fit: cover;
+            display: block;
+        }
+
+        .image-label {
+            position: absolute;
+            top: 13px;
+            left: 13px;
+            background: white;
+            color: var(--dark-green);
+            padding: 9px 13px;
+            border-radius: 7px;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        .image-caption {
+            padding: 13px 3px;
+        }
+
+        .image-caption h4 {
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .image-caption p {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        /* Prediction heading */
+
+        .section-label {
+            font-size: 9px;
+            color: #77877d;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+            margin-bottom: 9px;
+        }
+
+        .disease-name {
+            color: var(--dark-green);
+            font-size: clamp(23px, 3vw, 29px);
+            font-weight: 800;
+            line-height: 1.3;
+            margin-bottom: 16px;
+        }
+
+        .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 18px;
+        }
+
+        .tag {
+            background: #eff5f0;
+            color: #315b43;
+            padding: 7px 11px;
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+        }
+
+        /* Confidence card */
+
+        .confidence-card {
+            background: #eff8f1;
+            border: 1px solid #dcefe1;
+            border-radius: 13px;
+            padding: 19px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+            margin-bottom: 19px;
+        }
+
+        .confidence-number {
+            font-size: 29px;
+            color: var(--green);
+            font-weight: 800;
+            margin: 7px 0;
+        }
+
+        .confidence-label {
+            font-size: 11px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .confidence-message {
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.6;
+            max-width: 310px;
+        }
+
+        .confidence-circle {
+            --confidence: 0%;
+            width: 65px;
+            height: 65px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: conic-gradient(
+                var(--green) var(--confidence),
+                #d7e7dc var(--confidence)
+            );
+            display: grid;
+            place-items: center;
+        }
+
+        .confidence-circle::before {
+            content: "";
+            width: 49px;
+            height: 49px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        /* Top predictions */
+
+        .predictions-card {
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 17px;
+        }
+
+        .card-heading {
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 7px;
+        }
+
+        .card-description {
+            color: var(--muted);
+            font-size: 10px;
+            line-height: 1.6;
+            margin-bottom: 17px;
+        }
+
+        .prediction-row {
+            margin-bottom: 14px;
+        }
+
+        .prediction-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            font-size: 10px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .prediction-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rank {
+            background: var(--light-green);
+            color: var(--green);
+            padding: 4px 7px;
+            border-radius: 5px;
+            font-size: 9px;
+        }
+
+        .prediction-score {
+            color: var(--green);
+            white-space: nowrap;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 7px;
+            border-radius: 20px;
+            background: #e7eee9;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 20px;
+            background: linear-gradient(90deg, #108454, #35bc7e);
+        }
+
+        .prediction-note {
+            font-size: 10px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-top: 12px;
+        }
+
+        /* Symptoms and prevention */
+
+        .guidance-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-top: 20px;
+        }
+
+        .guidance-card {
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 18px;
+            background: white;
+        }
+
+        .guidance-heading {
+            font-size: 14px;
+            font-weight: 800;
+            margin-bottom: 14px;
+        }
+
+        .guidance-list {
+            list-style: none;
+        }
+
+        .guidance-list li {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            font-size: 12px;
+            line-height: 1.6;
+            margin-bottom: 9px;
+            color: #34463c;
+        }
+
+        .check {
+            display: inline-grid;
+            place-items: center;
+            flex-shrink: 0;
+            width: 16px;
+            height: 16px;
+            background: var(--green);
+            color: white;
+            border-radius: 50%;
+            font-size: 10px;
+            font-weight: 800;
+        }
+
+        /* Additional information */
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 13px;
+            margin-top: 18px;
+        }
+
+        .info-card {
+            background: #f0f8f2;
+            border: 1px solid #dcece0;
+            border-radius: 11px;
+            padding: 16px;
+        }
+
+        .info-card h4 {
+            font-size: 11px;
+            margin-bottom: 8px;
+        }
+
+        .info-card p {
+            font-size: 11px;
+            color: #53645a;
+            line-height: 1.6;
+        }
+
+        /* Disclaimer */
+
+        .warning-box {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: #fff7e8;
+            border: 1px solid #f3c978;
+            border-radius: 10px;
+            padding: 14px 17px;
+            margin-top: 18px;
+            color: #87501a;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .warning-icon {
+            font-size: 18px;
+        }
+
+        /* Action buttons */
+
+        .actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 9px;
+            padding: 13px 23px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 12px;
+            font-weight: 700;
+            transition: 0.2s;
+        }
+
+        .primary-btn {
+            background: var(--green);
+            color: white;
+            box-shadow: 0 5px 15px rgba(18, 134, 83, 0.18);
+        }
+
+        .primary-btn:hover {
+            background: var(--dark-green);
+            transform: translateY(-2px);
+        }
+
+        .secondary-btn {
+            border: 1px solid var(--green);
+            color: var(--green);
+            background: white;
+        }
+
+        .secondary-btn:hover {
+            background: var(--light-green);
+        }
+
+        .empty-message {
+            color: var(--muted);
+            font-size: 11px;
+        }
+
+        /* Responsive design */
+
+        @media (max-width: 850px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .crop-image {
+                height: 350px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 550px) {
+            .navbar {
+                padding: 12px 5%;
+            }
+
+            .brand {
+                font-size: 19px;
+            }
+
+            .nav-links {
+                gap: 12px;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .nav-links a {
+                font-size: 10px;
+            }
+
+            .logout-btn {
+                padding: 9px 12px;
+            }
+
+            .page-container {
+                width: 94%;
+                margin-top: 25px;
+            }
+
+            .report-body {
+                padding: 13px;
+            }
+
+            .report-header {
+                padding: 15px;
+            }
+
+            .crop-image {
+                height: 260px;
+            }
+
+            .guidance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .confidence-card {
+                padding: 14px;
+            }
+
+            .confidence-number {
+                font-size: 24px;
+            }
+
+            .confidence-circle {
+                width: 55px;
+                height: 55px;
+            }
+
+            .confidence-circle::before {
+                width: 41px;
+                height: 41px;
+            }
+
+            .action-btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="navbar">
+
+        <a href="{{ url_for('home') }}" class="brand">
+            ✦ Crop<span>AI</span>
+        </a>
+
+        <div class="nav-links">
+
+            <a href="{{ url_for('home') }}">Home</a>
+
+            {% if session.get('role') == 'admin' %}
+                <a href="{{ url_for('admin_dashboard') }}">
+                    Admin Dashboard
+                </a>
+            {% endif %}
+
+            <a href="{{ url_for('logout') }}" class="logout-btn">
+                Logout
+            </a>
+
+        </div>
+    </nav>
+
+    <main class="page-container">
+
+        <!-- Page heading -->
+        <p class="eyebrow">CROPAI · INTELLIGENT AGRICULTURE</p>
+
+        <h1 class="page-heading">
+            Advanced Crop Health Assessment
+        </h1>
+
+        <p class="page-description">
+            Review your AI-generated crop disease prediction, symptoms,
+            and recommended management practices.
+        </p>
+
+        <section class="report-card">
+
+            <!-- Report header -->
+            <div class="report-header">
+                <div class="report-title">
+                    🌱 Crop Disease Assessment Report
+                </div>
+
+                <span class="complete-badge">
+                    ● ANALYSIS COMPLETE
+                </span>
+            </div>
+
+            <div class="report-body">
+
+                <div class="main-grid">
+
+                    <!-- Uploaded image -->
+                    <div>
+
+                        <div class="image-wrapper">
+
+                            <span class="image-label">
+                                ORIGINAL UPLOADED IMAGE
+                            </span>
+
+                            {% if image_path %}
+                                <img
+                                    class="crop-image"
+                                    src="{{ image_path if image_path.startswith('http') or image_path.startswith('/') else url_for('static', filename=image_path) }}"
+                                    alt="Uploaded crop image"
+                                >
+                            {% else %}
+                                <div class="crop-image"></div>
+                            {% endif %}
+
+                        </div>
+
+                        <div class="image-caption">
+                            <h4>Image analysis input</h4>
+
+                            <p>
+                                This is the image submitted to the CropAI
+                                classification model.
+                            </p>
+                        </div>
+
+                    </div>
+
+                    <!-- Prediction information -->
+                    <div>
+
+                        <p class="section-label">
+                            PREDICTED DISEASE CLASS
+                        </p>
+
+                        <h2 class="disease-name">
+                            {{ disease }}
+                        </h2>
+
+                        <div class="tags">
+
+                            <span class="tag">
+                                🌱 Crop: {{ crop_name|default('Crop', true) }}
+                            </span>
+
+                            <span class="tag">
+                                🧠 Deep Learning Prediction
+                            </span>
+
+                        </div>
+
+                        <!-- Confidence -->
+                        {% set score = confidence|float %}
+
+                        <div class="confidence-card">
+
+                            <div>
+
+                                <p class="section-label">
+                                    MODEL CONFIDENCE
+                                </p>
+
+                                <div class="confidence-number">
+                                    {{ "%.2f"|format(score) }}%
+                                </div>
+
+                                <p class="confidence-label">
+                                    {{ confidence_label|default('Model confidence', true) }}
+                                </p>
+
+                                <p class="confidence-message">
+                                    {{ confidence_message|default('The model strongly favors this class. Verify the prediction using visible symptoms.', true) }}
+                                </p>
+
+                            </div>
+
+                            <div
+                                class="confidence-circle"
+                                style="--confidence: {{ [[score, 100]|min, 0]|max }}%;"
+                                aria-label="Model confidence {{ score }} percent"
+                            ></div>
+
+                        </div>
+
+                        <!-- Top 3 predictions -->
+                        <div class="predictions-card">
+
+                            <h3 class="card-heading">
+                                📊 Top 3 Model Predictions
+                            </h3>
+
+                            <p class="card-description">
+                                These are the three highest-scoring classes
+                                produced by the classification model.
+                            </p>
+
+                            {% if top_predictions %}
+
+                                {% for item in top_predictions[:3] %}
+
+                                    {% set item_score = item.confidence|float %}
+
+                                    <div class="prediction-row">
+
+                                        <div class="prediction-info">
+
+                                            <div class="prediction-name">
+
+                                                <span class="rank">
+                                                    #{{ loop.index }}
+                                                </span>
+
+                                                <span>
+                                                    {{ item.display_name }}
+                                                </span>
+
+                                            </div>
+
+                                            <span class="prediction-score">
+                                                {{ "%.2f"|format(item_score) }}%
+                                            </span>
+
+                                        </div>
+
+                                        <div class="progress-track">
+
+                                            <div
+                                                class="progress-fill"
+                                                style="width: {{ [[item_score, 100]|min, 0]|max }}%;"
+                                            ></div>
+
+                                        </div>
+
+                                    </div>
+
+                                {% endfor %}
+
+                            {% else %}
+
+                                <p class="empty-message">
+                                    Additional prediction scores are not available.
+                                </p>
+
+                            {% endif %}
+
+                            <p class="prediction-note">
+                                These scores are model outputs, not independent
+                                probabilities that confirm a disease.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Symptoms and prevention -->
+                <div class="guidance-grid">
+
+                    <!-- Symptoms -->
+                    <div class="guidance-card">
+
+                        <h3 class="guidance-heading">
+                            🔬 Symptoms and Visual Indicators
+                        </h3>
+
+                        <ul class="guidance-list">
+
+                            {% if symptoms is string %}
+
+                                <li>
+                                    <span class="check">✓</span>
+                                    {{ symptoms }}
+                                </li>
+
+                            {% elif symptoms %}
+
+                                {% for symptom in symptoms %}
+                                    <li>
+                                        <span class="check">✓</span>
+                                        {{ symptom }}
+                                    </li>
+                                {% endfor %}
+
+                            {% else %}
+
+                                <li class="empty-message">
+                                    Symptom information is unavailable.
+                                </li>
+
+                            {% endif %}
+
+                        </ul>
+
+                    </div>
+
+                    <!-- Prevention -->
+                    <div class="guidance-card">
+
+                        <h3 class="guidance-heading">
+                            🛡️ Prevention and Management
+                        </h3>
+
+                        <ul class="guidance-list">
+
+                            {% if prevention is string %}
+
+                                <li>
+                                    <span class="check">✓</span>
+                                    {{ prevention }}
+                                </li>
+
+                            {% elif prevention %}
+
+                                {% for item in prevention %}
+                                    <li>
+                                        <span class="check">✓</span>
+                                        {{ item }}
+                                    </li>
+                                {% endfor %}
+
+                            {% else %}
+
+                                <li class="empty-message">
+                                    Prevention information is unavailable.
+                                </li>
+
+                            {% endif %}
+
+                        </ul>
+
+                    </div>
+
+                </div>
+
+                <!-- Additional information -->
+                <div class="info-grid">
+
+                    <div class="info-card">
+                        <h4>🌿 Affected Parts</h4>
+                        <p>
+                            {{ affected_parts|default('Check leaves, stems and fruits.', true) }}
+                        </p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>🌤️ Favorable Conditions</h4>
+                        <p>
+                            {{ favorable_conditions|default('Environmental conditions may influence disease development.', true) }}
+                        </p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>🔍 Monitoring Advice</h4>
+                        <p>
+                            {{ monitoring|default('Inspect affected plants regularly.', true) }}
+                        </p>
+                    </div>
+
+                    <div class="info-card">
+                        <h4>🧪 Treatment Precautions</h4>
+                        <p>
+                            {{ treatment_notes|default('Consult an agricultural expert before treatment.', true) }}
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Important disclaimer -->
+                <div class="warning-box">
+
+                    <span class="warning-icon">⚠️</span>
+
+                    <p>
+                        <strong>Important Note:</strong>
+                        This is an AI-generated prediction, not a confirmed
+                        agricultural diagnosis. Model confidence does not
+                        guarantee accuracy. Consult an agricultural expert
+                        before applying treatments.
+                    </p>
+
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Action buttons -->
+        <div class="actions">
+
+            <a
+                href="{{ url_for('home') }}"
+                class="action-btn primary-btn"
+            >
+                ↻ Analyze Another Image
+            </a>
+
+            <a
+                href="{{ url_for('home') }}"
+                class="action-btn secondary-btn"
+            >
+                🏠 Go to Home
+            </a>
+
+        </div>
+
+    </main>
+
+</body>
+</html>
